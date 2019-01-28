@@ -11,14 +11,17 @@ public:
 
 	bool pause = false;
 
+	//ボール
 	Ball_kun ballkun{ {250,250} };
-
+	
+	//ゴール
+	Goal goal{ &ballkun , Vec2(400,400) };
 
 	//空のオブジェクトマネージャーを宣言
 	ObjectManager objectmanager = {} ;
 
 	//EditGUIがボールとオブジェクトをもつ
-	EditGUI editgui{ &ballkun,&objectmanager };
+	EditGUI editgui{ &ballkun,&objectmanager ,&goal };
 
 
 	Making(const InitData& init)
@@ -40,6 +43,7 @@ public:
 
 		//ballkunの位置をデータ通りに修正
 
+		//goalの位置をデータ通りに修正
 
 
 	}
@@ -48,35 +52,39 @@ public:
 	void update()override
 	{
 
-
+		//エディタはポーズ中でも使用可能
 		editgui.update();
 
 		//戻る
 		if (Key0.down())changeScene(SceneName::Select);
 
 	
-		//ポーズ(成功/失敗ポーズの後におく。)
+		//ポーズ(解く)
 		if (pause) {
 			if (KeyP.down())pause = false;
 			if (MouseR.down())changeScene(SceneName::Select);//戻る
 			return;
 		}
 
-		//ポーズならば解ける
+		//ポーズする
 		if (!pause && KeyP.down())pause = true;
 
 
-
+		//ボールの位置（顔）更新
 		ballkun.update();
 
+
 		//編集画面から出たら復帰する
-		if (!Rect(0,0,800, 600).intersects(ballkun.ballbody))ballkun.reset();
+		if (!Rect(0, 0, 800, 600).intersects(ballkun.ballbody))ballkun.reset();
+
+		//ゴールやオブジェクトと触れたからと言って特に何もしない
 		
+		goal.update();
 		objectmanager.update();
 
 		if (KeyZ.down())
 		{
-			changeScene(SceneName::Result);
+			changeScene(SceneName::Title);
 		}
 
 
@@ -90,17 +98,24 @@ public:
 
 		Window::ClientRect().draw(Palette::Black);
 
-		if (pause) getData().font(U"ポーズ\n\n戻る：右クリック").drawAt(Window::Center());
-
-
+		
+		//ゴールはオブジェクトに隠れ、ボールが最前線
+		
+		goal.draw();
 		objectmanager.draw();
 		ballkun.draw();
 
+
+		/*前線群*/
 
 		//編集画面の枠組み
 		Rect(800, 0, 400, 700).draw(Palette::Gray);
 		Rect(0, 600, 1200, 100).draw(Palette::Gray);
 
+		//出力部
+		if (pause) getData().font(U"ポーズ\n戻る：右クリック").drawAt(0, 600, Palette::Black);
+
+		//GUI(最前線)
 		editgui.draw();
 
 	}

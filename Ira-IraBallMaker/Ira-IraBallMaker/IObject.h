@@ -415,35 +415,35 @@ public:
 
 };
 
-class Goal :public IObject
-{
-public :
-
-	RectF goalrect = RectF(70, 70);
-	Vec2 pos;
-
-
-	Goal(Ball_kun* _ball) :IObject(_ball)
-	{};
-
-	bool goaled = false;
-
-	void update()override
-	{
-		//ボールとの衝突判定(完全に包んだ時にゴールとする)
-		if (goalrect.contains(Ball->ballbody)) 
-		{
-			goaled = true;
-		}
-		
-	}
-
-	void draw()const
-	{
-
-	}
-
-};
+//class Goal :public IObject
+//{
+//public :
+//
+//	RectF goalrect = RectF(70, 70);
+//	Vec2 pos;
+//
+//
+//	Goal(Ball_kun* _ball) :IObject(_ball)
+//	{};
+//
+//	bool goaled = false;
+//
+//	void update()override
+//	{
+//		//ボールとの衝突判定(完全に包んだ時にゴールとする)
+//		if (goalrect.contains(Ball->ballbody)) 
+//		{
+//			goaled = true;
+//		}
+//		
+//	}
+//
+//	void draw()const
+//	{
+//
+//	}
+//
+//};
 
 
 

@@ -18,9 +18,19 @@ public:
 	bool lose = false;
 	bool pause = false;
 
+	//クリアタイム記録用タイマー
+	Stopwatch timer;
+
+	Font timefont{ 10 };
+
+	//操作するボール
 	Ball_kun ballkun{ {250,250} };
 
-	//空のオブジェクトマネージャーを宣言
+	//ゴール
+	Goal goal{ &ballkun,Vec2(400,400) };
+
+
+	//空のオブジェクトマネージャーを宣言(データ読み込みの過程で代入)
 	ObjectManager objectmanager = {};
 
 	Game(const InitData& init)
@@ -48,7 +58,10 @@ public:
 		//ゴールの位置をデータ通りに修正
 		
 
+		//タイマー開始
 
+		if (timer.isRunning())timer.restart();
+		else timer.start();
 	}
 
 
@@ -64,7 +77,13 @@ public:
 		//成功/失敗用ポーズ
 		if (win || lose) {
 
-			if (win)ballkun.facechange("WIN");
+			//タイマー停止
+			timer.pause();
+
+			if (win) {
+				ballkun.facechange("WIN");
+				//タイマーのタイムを入れたりする
+			}
 			if(lose)ballkun.facechange("LOSE");
 
 			if (MouseL.down())changeScene(SceneName::Game);//もう一回
@@ -74,28 +93,41 @@ public:
 
 		
 
-		//ポーズ(成功/失敗ポーズの後におく。)
+		//ポーズ(解く)
 		if (pause) {
-			if (KeyP.down())pause = false;
+
+			if (KeyP.down())
+			{
+				timer.start();
+				pause = false;
+			}
 			if (MouseR.down())changeScene(SceneName::Select);//戻る
 			return;
 		}
 
-		//ポーズならば解ける
-		if (!pause && KeyP.down() && lose == false && win == false)pause = true;
+		//ポーズする
+		if (!pause && KeyP.down() && lose == false && win == false)
+		{
+			timer.pause();
+			pause = true;
+		}
 
 
-
+		//ボールの位置（顔）更新
 		ballkun.update();
-		//編集画面から出たらまけ
 
+		//ゴールに着いたら勝ち
+		win = goal.update();
+		
+		//オブジェクトとぶつかったら負け
 		lose = objectmanager.update();
 
+		//編集画面から出たら負け
 		if (!Rect(0,0,800, 600).intersects(ballkun.ballbody))lose = true;
 
 		if (KeyZ.down())
 		{
-			changeScene(SceneName::Result);
+			changeScene(SceneName::Title);
 		}
 	}
 
@@ -104,14 +136,26 @@ public:
 		
 		Window::ClientRect().draw(Palette::Black);
 
+		//ゴールはオブジェクトに隠れ、ボールが最前線
+
+		goal.draw();
+		objectmanager.draw();
+		ballkun.draw();
+
+
+		//最前線群
+
+		//テキスト出力部
 		if(pause) getData().font(U"ポーズ\n\nやり直す:左クリック\n戻る：右クリック").drawAt(Window::Center());
-		else if(win)  getData().font(U"ステージクリア！！\n\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center());
+		else if(win)  getData().font(U"ステージクリア！！\n　　　",timer.s(),U" 秒　　　\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center());
 		else if (lose) {
 			if(!Rect(0,0,800,600).intersects(ballkun.ballbody)) getData().font(U"コースアウト…\n\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center());
 			else getData().font(U"クリア失敗…\n\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center());
 		}
-		objectmanager.draw();
-		ballkun.draw();
+
+		//タイマー
+		timefont(timer.s()).draw();
+		
 	}
 
 

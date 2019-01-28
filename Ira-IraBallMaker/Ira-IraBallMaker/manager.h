@@ -2,6 +2,7 @@
 # include <Siv3D.hpp> // OpenSiv3D v0.3.1
 #include<HamFramework.hpp>
 #include "Ball_kun.h"
+#include"Goal.h"
 #include "IObject.h"
 
 enum class SceneName

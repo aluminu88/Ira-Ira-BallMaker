@@ -269,6 +269,7 @@
     <ClInclude Include="Ball_Kun.h" />
     <ClInclude Include="EditGUI.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Goal.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="Making.h" />
     <ClInclude Include="manager.h" />
