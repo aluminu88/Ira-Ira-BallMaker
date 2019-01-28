@@ -110,18 +110,18 @@ public :
 			//選択した図形の情報をハイライト、編集可能
 			else if (editoptions[editoraddIndex] == U"Edit")
 			{
-				std::shared_ptr<Block> a;
-				if (!objectmanagerptr->selectedObject == NULL) {
+				
+				if (!objectmanagerptr->selectedBlock == NULL) {
 					
 					//Blockとして扱うために代入
-					a = objectmanagerptr->selectedObject;
+					
 
-					block_w = a->block.w;
-					block_h = a->block.h;
-					block_r = a->rad;
-					block_rp = a->radplus;
-					block_vx = a->vx;
-					block_vy = a->vy;
+					block_w = objectmanagerptr->selectedBlock->block.w;
+					block_h = objectmanagerptr->selectedBlock->block.h;
+					block_r = objectmanagerptr->selectedBlock->rad;
+					block_rp = objectmanagerptr->selectedBlock->radplus;
+					block_vx = objectmanagerptr->selectedBlock->vx;
+					block_vy = objectmanagerptr->selectedBlock->vy;
 
 					
 

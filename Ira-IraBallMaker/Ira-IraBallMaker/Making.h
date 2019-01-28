@@ -15,7 +15,7 @@ public:
 
 
 	//空のオブジェクトマネージャーを宣言
-	ObjectManager objectmanager{&editgui} ;
+	ObjectManager objectmanager = {} ;
 
 	//EditGUIがボールとオブジェクトをもつ
 	EditGUI editgui{ &ballkun,&objectmanager };

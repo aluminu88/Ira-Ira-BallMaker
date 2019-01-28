@@ -16,7 +16,6 @@ Line
 
 #include<Siv3D.hpp>
 #include "Ball_Kun.h"
-#include"EditGUI.h"
 #include<memory>
 
 //áŠQ•¨‚ÌŠî’êƒNƒ‰ƒX
@@ -291,7 +290,7 @@ public:
 
 
 			//}Œ`‚ğ‘I‘ğ‚·‚é
-			if (block.rotated(rad).leftClicked() || sub_block.rotated(rad).leftClicked()) 
+			if ((block.rotated(rad).leftClicked() || sub_block.rotated(rad).leftClicked()) && !(Rect(800, 0, 400, 700).intersects(Cursor::Pos()) || Rect(0, 600, 1200, 100).intersects(Cursor::Pos())))
 			{
 				//if (getselect())d_select();
 				//select();
@@ -310,9 +309,10 @@ public:
 
 
 			}
-			else if (MouseL.down()) state = SelectState::none;
+			else if (MouseL.down() && !(Rect(800, 0, 400, 700).intersects(Cursor::Pos()) || Rect(0, 600, 1200, 100).intersects(Cursor::Pos()))) state = SelectState::none;
 
-			
+			//Rect(800, 0, 400, 700).draw(Palette::Gray);
+			//Rect(0, 600, 1200, 100).draw(Palette::Gray);
 
 
 			//}Œ`‚ğ’Í‚Ş
@@ -415,13 +415,19 @@ class ObjectManager {
 public :
 	std::vector<std::shared_ptr<IObject>> objects;
 
-	std::shared_ptr<IObject> selectedObject;
+	std::shared_ptr<Block> selectedBlock;
 
-	EditGUI* editgutptr;
+	std::vector<std::shared_ptr<Block>> blocks;
 
-	ObjectManager(EditGUI* _editgutptr) :editgutptr(_editgutptr) {};
 
-	void add(const std::shared_ptr<IObject>& ptr);
+
+	//EditGUI* editgutptr;
+
+	//ObjectManager(EditGUI* _editgutptr) :editgutptr(_editgutptr) {};
+
+	ObjectManager();
+
+	void add(const std::shared_ptr<Block>& ptr);
 	bool selectflag= false;
 	
 	bool update();

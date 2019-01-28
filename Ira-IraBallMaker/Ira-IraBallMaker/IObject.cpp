@@ -2,13 +2,18 @@
 
 
 
-ObjectManager::ObjectManager(EditGUI* _editgutptr)
+//ObjectManager::ObjectManager(EditGUI* _editgutptr)
+//{
+//}
+
+ObjectManager::ObjectManager()
 {
+
 }
 
-void ObjectManager::add(const std::shared_ptr<IObject>& ptr)
+void ObjectManager::add(const std::shared_ptr<Block>& ptr)
 {
-	objects.emplace_back(ptr);
+	blocks.emplace_back(ptr);
 }
 
 
@@ -17,27 +22,27 @@ bool ObjectManager::update()
 {
 	selectflag = true;
 
-	for (auto& object : objects)
+	for (auto& block : blocks)
 	{
-		object->update();
-		if (object->state == IObject::SelectState::select && selectflag==true)
+		block->update();
+		if (block->state == IObject::SelectState::select && selectflag==true)
 		{
 			if (selectflag == true) {
 				selectflag = false;
 				
-				
+				selectedBlock = block;
 
 			}
-			else object->state = IObject::SelectState::none;
+			else block->state = IObject::SelectState::none;
 		}
 		
-		if (object->gethit() && object->getID()<100)return true;
+		if (block->gethit() && block->getID()<100)return true;
 	}
 
-	auto iter = std::remove_if(objects.begin(), objects.end(), [](const std::shared_ptr<IObject>& ptr) {
+	auto iter = std::remove_if(blocks.begin(), blocks.end(), [](const std::shared_ptr<IObject>& ptr) {
 		return ptr->getdelete();
 	});
-	objects.erase(iter, objects.end());
+	blocks.erase(iter, blocks.end());
 
 	
 
@@ -47,8 +52,8 @@ bool ObjectManager::update()
 
 void ObjectManager::draw() const
 {
-	for (const auto& object : objects)
+	for (const auto& block : blocks)
 	{
-		object->draw();
+		block->draw();
 	}
 }
