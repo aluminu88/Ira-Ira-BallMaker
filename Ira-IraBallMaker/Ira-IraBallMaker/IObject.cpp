@@ -16,22 +16,30 @@ void ObjectManager::add(const std::shared_ptr<Block>& ptr)
 	blocks.emplace_back(ptr);
 }
 
+void ObjectManager::blockadd(const std::shared_ptr<Block>& ptr)
+{
+	blocks.emplace_back(ptr);
+}
+
 
 
 bool ObjectManager::update()
 {
 	selectflag = true;
 
-	for (auto& block : blocks)
+	for (auto&& block : blocks)
 	{
 		block->update();
-		if (block->state == IObject::SelectState::select && selectflag==true)
+		if (block->state == IObject::SelectState::select)
 		{
 			if (selectflag == true) {
-				selectflag = false;
+				
 				
 				selectedBlock = block;
 
+				selectflag = false;
+				
+				
 			}
 			else block->state = IObject::SelectState::none;
 		}

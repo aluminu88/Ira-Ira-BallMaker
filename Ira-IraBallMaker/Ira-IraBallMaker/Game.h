@@ -29,9 +29,11 @@ public:
 		Window::Resize(800, 600);
 		
 		//stagedataに合わせてデータの読み取り
-		//ObjectManagerの配列にObjectを代入
+		
 
-		//テスト用
+
+
+		//テスト用(ブロックの配置)
 		objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 0, 0,&ballkun));
 		objectmanager.add(std::make_shared<Block>(RectF(130, 30, 40, 100), Math::Pi / 4, 0, 0, 0, &ballkun));
 		objectmanager.add(std::make_shared<Block>(RectF(30, 130, 40, 100), 0, Math::Pi / 4, 0, 0, &ballkun));
@@ -41,6 +43,9 @@ public:
 
 
 		//ballkunの位置をデータ通りに修正
+
+
+		//ゴールの位置をデータ通りに修正
 		
 
 

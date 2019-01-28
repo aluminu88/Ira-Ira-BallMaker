@@ -38,10 +38,6 @@ protected:
 	bool d_selected = false;
 	bool deleted = false;
 
-	
-
-	
-
 
 public :
 
@@ -122,10 +118,13 @@ public:
 
 
 	//ボールとの衝突判定
-		if (Ball->ballbody.intersects(block.rotated(rad))) 
-		{
-			hitting();
-		}
+
+		//真衝突判定
+			if (Ball->ballbody.intersects(block.rotated(rad)))
+			{
+				hitting();
+			}
+		
 
 	//本体の処理
 
@@ -280,8 +279,7 @@ public:
 		}
 		//
 		
-
-
+		
 
 
 		//編集中のみできる処理
@@ -333,7 +331,7 @@ public:
 			//図形のhitを初期化する
 			if (gethit()) 
 			{
-				if (!Ball->ballbody.intersects(block.rotated(rad))) 
+				if (!(Ball->ballbody.intersects(block.rotated(rad)))&& !(Ball->ballbody.intersects(sub_block.rotated(rad)) && sub_block.intersects(Rect(0, 0, 800, 600))))
 				{
 					hitreset();
 				}
@@ -360,9 +358,12 @@ public:
 		if (gethit())
 		{
 			block.rotated(rad).draw(Palette::Red);//衝突→赤
+			//sub_block.rotated(rad).draw(Palette::Red);
 		}
-		else  block.rotated(rad).draw(Palette::White);//非衝突→白
-
+		else {
+			block.rotated(rad).draw(Palette::White);
+			//sub_block.rotated(rad).draw(Palette::White);//非衝突→白
+		}
 
 		//ループ移動のための描画
 
@@ -398,7 +399,12 @@ public:
 			{
 				block.rotated(rad).drawFrame(2, 0, Palette::Aqua);
 				
-			}else if (state == SelectState::d_select)  block.rotated(rad).drawFrame(2, 0, Palette::Orange);
+				
+			}
+			else if (state == SelectState::d_select) {
+				block.rotated(rad).drawFrame(2, 0, Palette::Orange);
+				
+			}
 
 		}
 
@@ -409,13 +415,44 @@ public:
 
 };
 
+class Goal :public IObject
+{
+public :
+
+	RectF goalrect = RectF(70, 70);
+	Vec2 pos;
+
+
+	Goal(Ball_kun* _ball) :IObject(_ball)
+	{};
+
+	bool goaled = false;
+
+	void update()override
+	{
+		//ボールとの衝突判定(完全に包んだ時にゴールとする)
+		if (goalrect.contains(Ball->ballbody)) 
+		{
+			goaled = true;
+		}
+		
+	}
+
+	void draw()const
+	{
+
+	}
+
+};
+
+
 
 class ObjectManager {
 
 public :
 	std::vector<std::shared_ptr<IObject>> objects;
 
-	std::shared_ptr<Block> selectedBlock;
+	std::shared_ptr<Block> selectedBlock ;
 
 	std::vector<std::shared_ptr<Block>> blocks;
 
@@ -428,6 +465,10 @@ public :
 	ObjectManager();
 
 	void add(const std::shared_ptr<Block>& ptr);
+	
+	void blockadd(const std::shared_ptr<Block>& ptr);
+
+	
 	bool selectflag= false;
 	
 	bool update();

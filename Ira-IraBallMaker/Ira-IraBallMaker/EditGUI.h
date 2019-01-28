@@ -24,6 +24,9 @@ public :
 
 	bool BlockGUIgrabbed = false;
 
+	std::shared_ptr<Block> checkBlock = 0;
+	
+
 	ObjectManager* objectmanagerptr;
 	Ball_kun* ballkunptr;
 
@@ -59,7 +62,7 @@ public :
 
 	void set_BlockGUI() 
 	{
-
+		
 	}
 
 	void edithighlight() 
@@ -75,6 +78,8 @@ public :
 
 		//Block用の項目
 
+		/*動かしたいならコメントアウトをとる
+
 		if (BlockGUIheader.leftClicked()) {
 			BlockGUIgrabbed = true;
 		}
@@ -85,6 +90,7 @@ public :
 			BlockGUIBox.pos += Cursor::DeltaF();
 			BlockGUIheader.pos = BlockGUIBox.pos;
 		}
+*/
 
 		stampRect = RectF(Cursor::Pos(),block_w, block_h);
 
@@ -113,15 +119,43 @@ public :
 				
 				if (!objectmanagerptr->selectedBlock == NULL) {
 					
-					//Blockとして扱うために代入
+					
+					
+					if (objectmanagerptr->selectedBlock != checkBlock) {//異なる=変更を検知
+						//初回だけ入れ替えるだけにしたい
+
+						block_w = objectmanagerptr->selectedBlock->block.w;
+						block_h = objectmanagerptr->selectedBlock->block.h;
+						block_r = objectmanagerptr->selectedBlock->rad;
+						block_rp = objectmanagerptr->selectedBlock->radplus;
+						block_vx = objectmanagerptr->selectedBlock->vx;
+						block_vy = objectmanagerptr->selectedBlock->vy;
+						//objectmanagerptr->selectedBlock->sub_block = objectmanagerptr->selectedBlock->block;
+
+						checkBlock = objectmanagerptr->selectedBlock;
+						
+						
+					}
+					else {
+						//常時反映可能
+						objectmanagerptr->selectedBlock->block.w = (int)block_w;
+						objectmanagerptr->selectedBlock->block.h = (int)block_h;
+						objectmanagerptr->selectedBlock->rad = (int)block_r;
+						objectmanagerptr->selectedBlock->radplus = (int)block_rp;
+						objectmanagerptr->selectedBlock->vx = (int)block_vx;
+						objectmanagerptr->selectedBlock->vy = (int)block_vy;
+
+						objectmanagerptr->selectedBlock->sub_block.w = (int)block_w;
+						objectmanagerptr->selectedBlock->sub_block.h = (int)block_h;
+
 					
 
-					block_w = objectmanagerptr->selectedBlock->block.w;
-					block_h = objectmanagerptr->selectedBlock->block.h;
-					block_r = objectmanagerptr->selectedBlock->rad;
-					block_rp = objectmanagerptr->selectedBlock->radplus;
-					block_vx = objectmanagerptr->selectedBlock->vx;
-					block_vy = objectmanagerptr->selectedBlock->vy;
+						
+
+					}
+
+
+
 
 					
 
