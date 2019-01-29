@@ -24,6 +24,9 @@ public:
 	EditGUI editgui{ &ballkun,&objectmanager ,&goal };
 
 
+	DataManager datamanager{ &objectmanager, &goal };
+
+
 	Making(const InitData& init)
 		: IScene(init)
 	{
@@ -32,12 +35,17 @@ public:
 		//stagedataに合わせてデータの読み取り
 		//ObjectManagerの配列にObjectを代入
 
+		datamanager.setEditGUptr(&editgui);
+
+		datamanager.stageread(getData().filepath, ballkun);
+
+
 		//テスト用
-		objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 0, 0, &ballkun));
-		objectmanager.add(std::make_shared<Block>(RectF(130, 30, 40, 100), Math::Pi / 4, 0, 0, 0, &ballkun));
-		objectmanager.add(std::make_shared<Block>(RectF(30, 130, 40, 100), 0, Math::Pi / 4, 0, 0, &ballkun));
-		objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 10, 0, &ballkun));
-		objectmanager.add(std::make_shared<Block>(RectF(100, 100, 40, 100), 0, 0, 0, 5, &ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 0, 0, &ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(130, 30, 40, 100), Math::Pi / 4, 0, 0, 0, &ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(30, 130, 40, 100), 0, Math::Pi / 4, 0, 0, &ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 10, 0, &ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(100, 100, 40, 100), 0, 0, 0, 5, &ballkun));
 		//objectmanager.add(std::make_shared<Block>(RectF(150, 150, 40, 100), 0, 0, 5, 5, &ballkun));
 
 
@@ -54,6 +62,10 @@ public:
 
 		//エディタはポーズ中でも使用可能
 		editgui.update();
+		if (editgui.saving) 
+		{
+			datamanager.stagesave(getData().stagenum);
+		}
 
 		//戻る
 		if (Key0.down())changeScene(SceneName::Select);

@@ -33,6 +33,10 @@ public:
 	//空のオブジェクトマネージャーを宣言(データ読み込みの過程で代入)
 	ObjectManager objectmanager = {};
 
+
+	//データ読み出し用
+	DataManager datamanader {&objectmanager, &goal };
+
 	Game(const InitData& init)
 		: IScene(init)
 	{
@@ -40,22 +44,22 @@ public:
 		
 		//stagedataに合わせてデータの読み取り
 		
+		datamanader.stageread(getData().filepath,ballkun);
 
+		
+		//ballkunの位置をデータ通りに修正
+		//ゴールの位置をデータ通りに修正
+		//Blockをデータ通りに配置
 
 
 		//テスト用(ブロックの配置)
-		objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 0, 0,&ballkun));
-		objectmanager.add(std::make_shared<Block>(RectF(130, 30, 40, 100), Math::Pi / 4, 0, 0, 0, &ballkun));
-		objectmanager.add(std::make_shared<Block>(RectF(30, 130, 40, 100), 0, Math::Pi / 4, 0, 0, &ballkun));
-		objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 10, 0, &ballkun));
-		objectmanager.add(std::make_shared<Block>(RectF(100, 100, 40, 100), 0, 0, 0, 5, &ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 0, 0,&ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(130, 30, 40, 100), Math::Pi / 4, 0, 0, 0, &ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(30, 130, 40, 100), 0, Math::Pi / 4, 0, 0, &ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 10, 0, &ballkun));
+		//objectmanager.add(std::make_shared<Block>(RectF(100, 100, 40, 100), 0, 0, 0, 5, &ballkun));
 		//objectmanager.add(std::make_shared<Block>(RectF(150, 150, 40, 100), 0, 0, 5, 5, &ballkun));
-
-
-		//ballkunの位置をデータ通りに修正
-
-
-		//ゴールの位置をデータ通りに修正
+		
 		
 
 		//タイマー開始

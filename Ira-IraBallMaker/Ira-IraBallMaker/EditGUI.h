@@ -359,7 +359,7 @@ public :
 
 
 		//•Û‘¶ƒ{ƒ^ƒ“
-		if (SimpleGUI::Button(U"•Û‘¶", Vec2(1110, 10), 50))
+		if (SimpleGUI::Button(U"•Û‘¶", Vec2(1110, 10), 50,!saving))
 		{
 			
 

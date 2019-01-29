@@ -4,6 +4,7 @@
 #include "Ball_kun.h"
 #include"Goal.h"
 #include "IObject.h"
+#include"DataManager.h"
 
 enum class SceneName
 {

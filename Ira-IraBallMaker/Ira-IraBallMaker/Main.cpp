@@ -21,6 +21,10 @@ void Main()
 
 	Window::Resize(800, 600);
 
+
+	
+
+
 	while (System::Update())
 	{
 		if (!scenemanager.update())

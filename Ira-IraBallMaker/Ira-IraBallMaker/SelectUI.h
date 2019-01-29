@@ -60,11 +60,15 @@ private:
 		int ID;
 		String stagename;
 		Texture thumbnail;
+		String clearstate;
+		int cleartime;
 
-		SelectNodeData(int _ID, String _stagename, Texture _thumbnail):
+		SelectNodeData(int _ID, String _stagename, Texture _thumbnail,String _clearstate,int _cleartime):
 			ID(_ID),
 			stagename(_stagename),
-			thumbnail(_thumbnail)
+			thumbnail(_thumbnail),
+			clearstate(_clearstate),
+			cleartime(_cleartime)
 		{}	
 	
 	};
@@ -74,7 +78,7 @@ private:
 	//各項目を格納している配列
 	std::vector<SelectNodeData> stagenodedata;
 
-
+	CSVData readcsv;
 	
 
 	//情報のセットのための関数
@@ -91,8 +95,19 @@ private:
 	{
 		//管理用CSVを呼んでファイル数だけ(for)回し、画像、名前を取り出しつつIDを振る(Makingなら最後に新規作成項目を付ける)
 
+		readcsv.load(U"StagesData/StagesData.csv");
+
+		for (size_t i = 1; i < readcsv.columns(1); i++) //0行目以外の要素数だけ回す
+		{
+			//項目一つずつにIDを振りながら、スクリーンショットをテクスチャ変換しつつノードのデータとして格納する
+			stagenodedata.emplace_back(i, readcsv.get<String>(i, 0), Texture{ readcsv.get<String>(i,1) },readcsv.get<String>(i,2),readcsv.get<int>(i,3));
+			
+		}
+
+
+
 		//テスト用
-		stagenodedata.emplace_back(1, U"テスト1", DummyTexture);
+		/*stagenodedata.emplace_back(1, U"テスト1", DummyTexture);
 		stagenodedata.emplace_back(2, U"テスト2", DummyTexture);
 		stagenodedata.emplace_back(3, U"テスト3", DummyTexture);
 		stagenodedata.emplace_back(4, U"テスト4", DummyTexture);
@@ -101,9 +116,11 @@ private:
 		stagenodedata.emplace_back(7, U"テスト7", DummyTexture);
 		stagenodedata.emplace_back(8, U"テスト8", DummyTexture);
 		stagenodedata.emplace_back(9, U"テスト9", DummyTexture);
-		stagenodedata.emplace_back(10, U"テスト10", DummyTexture);
+		stagenodedata.emplace_back(10, U"テスト10", DummyTexture);*/
 
-		if (mode == selectmode::Maiking)stagenodedata.emplace_back(11, U"新規作成", DummyTexture);
+		if (mode == selectmode::Maiking)stagenodedata.emplace_back(readcsv.columns(1)+1, U"新規作成", DummyTexture,U"No",9999);
+
+
 
 	}
 
@@ -150,9 +167,17 @@ public:
 		preview_node(stagenodedata.begin()->thumbnail(0, 0, 800, 600)).draw().drawFrame(1, Palette::Aqua);
 
 		//
+		String detailtext;
 
 		//詳細ノードの表示
+		if (stagenodedata.begin()->clearstate == U"Yes") detailtext = U"Cleard!!";
+		else detailtext = U"NO Clear";
+		
+
 		detail_node.draw();
+
+		if(stagenodedata.begin()->cleartime != 9999)font20(detailtext, U"　　　Time:", time, U"秒").drawAt(detail_node.center(),Palette::Black);
+		else font20(detailtext, U"　　　Time:", U"---秒").drawAt(detail_node.center(), Palette::Black);
 
 
 		//OKノードの表示
