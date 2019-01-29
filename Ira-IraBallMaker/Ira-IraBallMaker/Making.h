@@ -100,7 +100,8 @@ public:
 
 		
 		//ゴールはオブジェクトに隠れ、ボールが最前線
-		
+		editgui.drawstart();
+
 		goal.draw();
 		objectmanager.draw();
 		ballkun.draw();

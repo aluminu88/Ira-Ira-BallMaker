@@ -3,6 +3,7 @@
 #include "Iobject.h"
 #include"Goal.h"
 
+
 class EditGUI{ 
 
 public :
@@ -11,16 +12,26 @@ public :
 	Ball_kun* ballkunptr;
 	Goal* goalptr;
 
+	//DataManager datamanager {objectmanagerptr,goalptr};
+
+
+
 	/*管理用*/
 
 	mutable TextEditState stagename{ U"ステージ名" };
 
 	Font datafont{ 20 }, itemfont{15};
 
+	//
+
+	mutable bool saving = false;
+
 	/*Goal用*/
 
 	bool goalgrabbed = false;
 
+	/*ボールのスタート地点*/
+	Circle startcircle = Circle{Vec2(250,250),30.0};
 
 	/*Block用*/
 
@@ -106,6 +117,14 @@ public :
 
 			//画面内に完全に入っていない場合位置をリセットする
 			if(!Rect(0,0,800,600).contains(goalptr->goalrect)) goalptr->goalrect.setPos(400, 400);
+
+			//マウス右クリックでスタート地点を設定
+			if (Rect(0, 0, 800, 600).intersects(Cursor::Pos()) && MouseR.down()) 
+			{
+				startcircle.setPos(Cursor::Pos());
+				goalptr->startpos = Cursor::Pos();
+			}
+
 			
 
 		}else c_editoradd = true;
@@ -342,6 +361,9 @@ public :
 		//保存ボタン
 		if (SimpleGUI::Button(U"保存", Vec2(1110, 10), 50))
 		{
+			
+
+			saving = true;
 			//ファイル指定
 			//スクリーンショットをとる(GUIを見えなくする？)
 			//ステージ名とオブジェクトデータ,スクショの保存
@@ -355,28 +377,32 @@ public :
 
 	}
 
+	void drawstart()const 
+	{
+		//描画順を考慮して分離
+		startcircle.draw(Palette::Whitesmoke);
+	}
+
 
 	void draw()const 
 	{
 
 		//共通
 
-		CommonGUIsystem();
 
 
-		//GUIの描画
+		//GUIウィンドウの描画
 		BlockGUIBox.draw(Palette::Silver);
 		BlockGUIheader.draw(Palette::White);
 		datafont(U"BlockGUI").drawAt(BlockGUIheader.center(),Palette::Black);
 
 
-		
-
-
-
 		//マウス座標の表示
 		datafont(Cursor::Pos()).draw(800,200);
 
+		//GUI
+
+		CommonGUIsystem();
 		BlockGUIsystem();
 
 

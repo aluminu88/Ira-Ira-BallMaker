@@ -13,6 +13,7 @@ public :
 	RectF goalrect = RectF(70, 70);
 	Vec2 pos;
 	Ball_kun* ballptr;
+	Vec2 startpos = {250,250};
 
 	Goal(Ball_kun* _ball,Vec2 _pos) :ballptr(_ball),pos(_pos)
 	{

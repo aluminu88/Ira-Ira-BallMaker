@@ -267,6 +267,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball_Kun.h" />
+    <ClInclude Include="DataManager.h" />
     <ClInclude Include="EditGUI.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Goal.h" />
