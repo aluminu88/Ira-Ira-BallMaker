@@ -17,6 +17,7 @@ public:
 	bool win=false;
 	bool lose = false;
 	bool pause = false;
+	bool newrecord = false;
 
 	//クリアタイム記録用タイマー
 	Stopwatch timer;
@@ -44,10 +45,10 @@ public:
 		
 		//stagedataに合わせてデータの読み取り
 		
-		datamanader.stageread(getData().filepath,ballkun);
+		datamanader.stageread(getData().filepath,ballkun,getData().mode);
 
 		
-		//ballkunの位置をデータ通りに修正
+		
 		//ゴールの位置をデータ通りに修正
 		//Blockをデータ通りに配置
 
@@ -60,6 +61,9 @@ public:
 		//objectmanager.add(std::make_shared<Block>(RectF(100, 100, 40, 100), 0, 0, 0, 5, &ballkun));
 		//objectmanager.add(std::make_shared<Block>(RectF(150, 150, 40, 100), 0, 0, 5, 5, &ballkun));
 		
+		//ballkunの位置をデータ通りに修正
+		ballkun.pos = goal.startpos;
+		ballkun.ballbody.setPos(goal.startpos);
 		
 
 		//タイマー開始
@@ -76,7 +80,7 @@ public:
 		if (Key0.down())changeScene(SceneName::Select);
 
 		//if(win) ballkun.
-
+		
 
 		//成功/失敗用ポーズ
 		if (win || lose) {
@@ -86,6 +90,7 @@ public:
 
 			if (win) {
 				ballkun.facechange("WIN");
+				newrecord = datamanader.cleardata(getData().stagenum,getData().filepath,timer.s());
 				//タイマーのタイムを入れたりする
 			}
 			if(lose)ballkun.facechange("LOSE");
@@ -150,11 +155,14 @@ public:
 		//最前線群
 
 		//テキスト出力部
-		if(pause) getData().font(U"ポーズ\n\nやり直す:左クリック\n戻る：右クリック").drawAt(Window::Center());
-		else if(win)  getData().font(U"ステージクリア！！\n　　　",timer.s(),U" 秒　　　\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center());
+		if(pause) getData().font(U"ポーズ\n\nやり直す:左クリック\n戻る：右クリック").drawAt(Window::Center(), Palette::Aqua);
+		else if (win) {
+			if(newrecord)getData().font(U"ステージクリア！！\n新記録！！\n", timer.s(), U" 秒　　　\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center(), Palette::Aqua);
+			else getData().font(U"ステージクリア！！\n　　　", timer.s(), U" 秒　　　\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center(), Palette::Aqua);
+		}
 		else if (lose) {
-			if(!Rect(0,0,800,600).intersects(ballkun.ballbody)) getData().font(U"コースアウト…\n\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center());
-			else getData().font(U"クリア失敗…\n\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center());
+			if(!Rect(0,0,800,600).intersects(ballkun.ballbody)) getData().font(U"コースアウト…\n\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center(),Palette::Aqua);
+			else getData().font(U"クリア失敗…\n\nもう一回:左クリック\n戻る:右クリック").drawAt(Window::Center(), Palette::Aqua);
 		}
 
 		//タイマー

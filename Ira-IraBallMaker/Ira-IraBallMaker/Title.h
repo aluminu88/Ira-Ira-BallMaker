@@ -39,6 +39,9 @@ public:
 		
 		FileSystem::Remove(U"StagesData/NewStagesData.csv");
 
+
+		
+
 	}
 
 
@@ -76,7 +79,7 @@ public:
 
 		if (KeyT.down()) 
 		{
-			//screenshot();
+			screenshot();
 		}
 
 

@@ -36,10 +36,13 @@ public:
 		//ObjectManagerの配列にObjectを代入
 
 		datamanager.setEditGUptr(&editgui);
+		datamanager.editguiptr->tmp = getData().filepath;
+		datamanager.editguiptr->stagename.text = getData().filepath;
 
-		datamanager.stageread(getData().filepath, ballkun);
 
+		datamanager.stageread(getData().filepath, ballkun,getData().mode);
 
+		
 		//テスト用
 		//objectmanager.add(std::make_shared<Block>(RectF(30, 30, 40, 100), 0, 0, 0, 0, &ballkun));
 		//objectmanager.add(std::make_shared<Block>(RectF(130, 30, 40, 100), Math::Pi / 4, 0, 0, 0, &ballkun));
@@ -50,7 +53,10 @@ public:
 
 
 		//ballkunの位置をデータ通りに修正
-
+		editgui.startcircle.setPos(goal.startpos);
+		ballkun.pos = goal.startpos;
+		ballkun.ballbody.setPos (goal.startpos);
+		
 		//goalの位置をデータ通りに修正
 
 
@@ -65,10 +71,11 @@ public:
 		if (editgui.saving) 
 		{
 			datamanager.stagesave(getData().stagenum);
+			changeScene(SceneName::Select);
 		}
 
 		//戻る
-		if (Key0.down())changeScene(SceneName::Select);
+		if (Key0.down()&&KeyZ.down())changeScene(SceneName::Select);
 
 	
 		//ポーズ(解く)
@@ -90,13 +97,13 @@ public:
 		if (!Rect(0, 0, 800, 600).intersects(ballkun.ballbody))ballkun.reset();
 
 		//ゴールやオブジェクトと触れたからと言って特に何もしない
-		
+		//
 		goal.update();
 		objectmanager.update();
 
 		if (KeyZ.down())
 		{
-			changeScene(SceneName::Title);
+			//changeScene(SceneName::Title);
 		}
 
 
@@ -110,11 +117,11 @@ public:
 
 		Window::ClientRect().draw(Palette::Black);
 
-		
+		//
 		//ゴールはオブジェクトに隠れ、ボールが最前線
-		editgui.drawstart();
 
 		goal.draw();
+		editgui.drawstart();
 		objectmanager.draw();
 		ballkun.draw();
 
@@ -128,7 +135,7 @@ public:
 		//出力部
 		if (pause) getData().font(U"ポーズ\n戻る：右クリック").drawAt(0, 600, Palette::Black);
 
-		//GUI(最前線)
+		////GUI(最前線)
 		editgui.draw();
 
 	}

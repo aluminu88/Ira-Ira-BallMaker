@@ -96,7 +96,7 @@ public:
 
 	double rad, radplus, vx, vy;
 	
-
+	
 	Block(RectF _rect, double _rad, double _radplus, double _vx, double _vy, Ball_kun* _Ball) :
 		block(_rect),
 		rad(_rad),
@@ -105,10 +105,24 @@ public:
 		vy(_vy),
 		IObject(_Ball)
 	{
-		setID(101);
+		setID(1);
 		pos = block.pos;
 		sub_block = block;
 		
+	}
+
+	Block(RectF _rect, double _rad, double _radplus, double _vx, double _vy, Ball_kun* _Ball,int _option) :
+		block(_rect),
+		rad(_rad),
+		radplus(_radplus),
+		vx(_vx),
+		vy(_vy),
+		IObject(_Ball)
+	{
+		setID(_option);//mode=0:Game,1:Making
+		pos = block.pos;
+		sub_block = block;
+
 	}
 
 	void update()override 
@@ -129,6 +143,8 @@ public:
 	//本体の処理
 
 		//回転
+		
+
 		rad += radplus;
 		if (rad > 6.28) {
 
@@ -283,7 +299,7 @@ public:
 
 
 		//編集中のみできる処理
-		if (getID() > 100) 
+		if (getID() == 1) 
 		{
 
 
@@ -342,9 +358,9 @@ public:
 			{
 				if (MouseR.down()|| KeyD.down()) kill();
 				
-				if (MouseL.up() && !Rect(Window::Size()).intersects(block)) kill();
+				if (MouseL.up() && !Rect(0,0,800,600).intersects(block)) kill();
 			}
-
+			if ((int)block.h == 0 && (int)block.w == 0) kill();
 
 		}
 
@@ -392,7 +408,7 @@ public:
 
 
 		//編集中のみの処理
-		if (getID() > 100)
+		if (getID() == 1)
 		{
 			//選択されている
 			if (state == SelectState::select)

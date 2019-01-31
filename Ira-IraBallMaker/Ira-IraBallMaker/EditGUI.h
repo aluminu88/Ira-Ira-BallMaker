@@ -28,7 +28,7 @@ public :
 
 	/*Goal用*/
 
-	bool goalgrabbed = false;
+	mutable bool goalgrabbed = false;
 
 	/*ボールのスタート地点*/
 	Circle startcircle = Circle{Vec2(250,250),30.0};
@@ -37,7 +37,7 @@ public :
 
 	//GUI用変数
 	mutable double block_w = 0.0, block_h = 0.0, block_r=0.0,block_rp=0.0,block_vx=0.0,block_vy=0.0;
-	mutable bool c_vx = true, c_vy = false,c_additon = false,c_editoradd = true;
+	mutable bool c_vx = true, c_vy = false, c_additon = false, c_editoradd = true, c_savebutton = true;
 
 	//GUI用ウィンドウ
 	RectF BlockGUIBox = RectF(2000, 250, 400, 450);//{800,250}が定位置
@@ -57,7 +57,9 @@ public :
 		objectmanagerptr(_objectmanagerptr),
 		ballkunptr(_ballkunptr),
 		goalptr(_goalptr)
-	{}
+	{
+		
+	}
 	
 
 	/*ラジオボタン用*/
@@ -91,7 +93,7 @@ public :
 	
 	mutable size_t objectIndex = 0;
 	
-
+	String tmp = U"ステージ名";
 
 	void update() 
 	{
@@ -202,8 +204,8 @@ public :
 						//常時反映可能
 						objectmanagerptr->selectedBlock->block.w = (int)block_w;
 						objectmanagerptr->selectedBlock->block.h = (int)block_h;
-						objectmanagerptr->selectedBlock->rad = (int)block_r;
-						objectmanagerptr->selectedBlock->radplus = (int)block_rp;
+						objectmanagerptr->selectedBlock->rad = block_r;
+						objectmanagerptr->selectedBlock->radplus = block_rp;
 						objectmanagerptr->selectedBlock->vx = (int)block_vx;
 						objectmanagerptr->selectedBlock->vy = (int)block_vy;
 
@@ -283,33 +285,33 @@ public :
 		itemfont(U"rad:").draw(BlockGUIBox.pos + Vec2(2, 120), Palette::Black);
 		if (SimpleGUI::Button(U"-", BlockGUIBox.pos + Vec2(65, 120), 20))
 		{
-			block_r--;
+			block_r-=0.01;
 		}
-		SimpleGUI::Slider(block_r, -360, 360, BlockGUIBox.pos + Vec2(90, 120), 200);//角度
+		SimpleGUI::Slider(block_r, -3.14, 3.14, BlockGUIBox.pos + Vec2(90, 120), 200);//角度
 		if (SimpleGUI::Button(U"+", BlockGUIBox.pos + Vec2(295, 120), 20))
 		{
-			block_r++;
+			block_r+=0.01;
 		}
-		datafont((int)block_r).draw(BlockGUIBox.pos + Vec2(320, 120), Palette::Black);
+		datafont(block_r).draw(BlockGUIBox.pos + Vec2(320, 120), Palette::Black);
 		if (SimpleGUI::Button(U"0", BlockGUIBox.pos + Vec2(365, 120), 20))
 		{
-			block_r = 0;
+			block_r = 0.00;
 		}
 
 		itemfont(U"radplus:").draw(BlockGUIBox.pos + Vec2(2, 160), Palette::Black);
 		if (SimpleGUI::Button(U"-", BlockGUIBox.pos + Vec2(65, 160), 20))
 		{
-			block_rp--;
+			block_rp-=0.01;
 		}
-		SimpleGUI::Slider(block_rp, -360_deg, 360_deg, BlockGUIBox.pos + Vec2(90, 160), 200);//角速度
+		SimpleGUI::Slider(block_rp, -3.14, 3.14, BlockGUIBox.pos + Vec2(90, 160), 200);//角速度
 		if (SimpleGUI::Button(U"+", BlockGUIBox.pos + Vec2(295, 160), 20))
 		{
-			block_rp++;
+			block_rp+=0.01;
 		}
-		datafont((int)block_rp).draw(BlockGUIBox.pos + Vec2(320, 160), Palette::Black);
+		datafont(block_rp).draw(BlockGUIBox.pos + Vec2(320, 160), Palette::Black);
 		if (SimpleGUI::Button(U"0", BlockGUIBox.pos + Vec2(365, 160), 20))
 		{
-			block_rp = 0;
+			block_rp = 0.0;
 		}
 
 
@@ -356,17 +358,24 @@ public :
 		//ステージ名入力用
 		SimpleGUI::TextBox(stagename, Vec2(890, 10), 200, 10);
 
+		//「新規作成」名、セーブ中、同名ファイルが存在する場合は保存できないようにする(NULLは自動でやっている)
+		if (stagename.text == U"新規作成" || saving==true || (FileSystem::Exists(U"StagesData/" + stagename.text) == true && stagename.text != tmp))c_savebutton = false;
+		else c_savebutton = true;
 
+
+		
 
 		//保存ボタン
-		if (SimpleGUI::Button(U"保存", Vec2(1110, 10), 50,!saving))
+		if (SimpleGUI::Button(U"保存", Vec2(1110, 10), 50,c_savebutton))
 		{
 			
-
 			saving = true;
+			
 			//ファイル指定
 			//スクリーンショットをとる(GUIを見えなくする？)
 			//ステージ名とオブジェクトデータ,スクショの保存
+
+			//この後の処理はMakingを介してDataManagerで行われる
 		}
 
 		itemfont(U"Edit or Add:").draw(802, 60, Palette::Black);
@@ -376,6 +385,8 @@ public :
 		SimpleGUI::RadioButtons(objectIndex, objectoptions, Vec2(900, 90), 100);
 
 	}
+
+	
 
 	void drawstart()const 
 	{

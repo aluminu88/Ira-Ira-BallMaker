@@ -70,8 +70,16 @@ private:
 			clearstate(_clearstate),
 			cleartime(_cleartime)
 		{}	
-	
+
+		SelectNodeData(int _ID, String _stagename, Texture _thumbnail) :
+			ID(_ID),
+			stagename(_stagename),
+			thumbnail(_thumbnail)
+		{}
+
 	};
+
+
 
 	Texture DummyTexture{ U"screenshot/Dummy.png" };
 
@@ -91,18 +99,21 @@ private:
 	
 	selectmode mode;
 
-	void set_selectUI() 
+	void set_selectUI()
 	{
 		//管理用CSVを呼んでファイル数だけ(for)回し、画像、名前を取り出しつつIDを振る(Makingなら最後に新規作成項目を付ける)
 
 		readcsv.load(U"StagesData/StagesData.csv");
 
-		for (size_t i = 1; i < readcsv.columns(1); i++) //0行目以外の要素数だけ回す
+
+		for (int i = 1; i < (int)readcsv.rows(); i++) //0行目以外の要素数だけ回す
 		{
 			//項目一つずつにIDを振りながら、スクリーンショットをテクスチャ変換しつつノードのデータとして格納する
 			stagenodedata.emplace_back(i, readcsv.get<String>(i, 0), Texture{ readcsv.get<String>(i,1) },readcsv.get<String>(i,2),readcsv.get<int>(i,3));
-			
+
 		}
+
+		if (mode == selectmode::Maiking)stagenodedata.emplace_back(5, U"新規作成", DummyTexture,U"No", 9999);
 
 
 
@@ -118,7 +129,7 @@ private:
 		stagenodedata.emplace_back(9, U"テスト9", DummyTexture);
 		stagenodedata.emplace_back(10, U"テスト10", DummyTexture);*/
 
-		if (mode == selectmode::Maiking)stagenodedata.emplace_back(readcsv.columns(1)+1, U"新規作成", DummyTexture,U"No",9999);
+
 
 
 
@@ -176,7 +187,7 @@ public:
 
 		detail_node.draw();
 
-		if(stagenodedata.begin()->cleartime != 9999)font20(detailtext, U"　　　Time:", time, U"秒").drawAt(detail_node.center(),Palette::Black);
+		if(stagenodedata.begin()->cleartime != 9999)font20(detailtext, U"　　　Time:", stagenodedata.begin()->cleartime, U"秒").drawAt(detail_node.center(),Palette::Black);
 		else font20(detailtext, U"　　　Time:", U"---秒").drawAt(detail_node.center(), Palette::Black);
 
 
@@ -263,7 +274,7 @@ public:
 		if (OK_node.leftClicked()) {
 
 			//受け取った遷移関数に選択されたIDを乗せる
-			changescene(stagenodedata.begin()->ID,stagenodedata.begin()->stagename);
+			changescene(stagenodedata.begin()->ID, stagenodedata.begin()->stagename);//stagenodedata.begin()->stagename
 
 		}
 

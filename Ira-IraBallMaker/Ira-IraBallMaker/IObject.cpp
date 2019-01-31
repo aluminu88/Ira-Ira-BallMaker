@@ -42,9 +42,12 @@ bool ObjectManager::update()
 				
 			}
 			else block->state = IObject::SelectState::none;
+
+			
+
 		}
 		
-		if (block->gethit() && block->getID()<100)return true;
+		if (block->gethit() == true && block->getID() ==0) { return true; }
 	}
 
 	auto iter = std::remove_if(blocks.begin(), blocks.end(), [](const std::shared_ptr<IObject>& ptr) {
@@ -63,5 +66,10 @@ void ObjectManager::draw() const
 	for (const auto& block : blocks)
 	{
 		block->draw();
+		/*if (block->gethit())
+		{
+			Print(block->block.pos);
+		}*/
+		
 	}
 }

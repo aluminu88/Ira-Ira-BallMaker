@@ -82,18 +82,27 @@ public:
 
 		//前の内容をコピー
 
-		//新しいファイルを一時的に開く
+		//既存ファイルを一時的に開き、要素を格納する
 		csvdata.load(U"StagesData/StagesData.csv");
-		for (size_t i = 1; i < csvdata.columns(1) ; i++) 
+		for (size_t i = 1; i < csvdata.rows() ; i++) 
 		{
 			stagesdatalist.emplace_back(i, csvdata.get<String>(i, 0), csvdata.get<String>(i, 1), csvdata.get<String>(i, 2), csvdata.get<int>(i, 3));
+		}
+
+
+		if (ID == (int)csvdata.rows()) {
+			//新規作成時に上書きできるように保持
+			stagesdatalist.emplace_back(csvdata.rows(), U"新規作成", U"None", U"None", 9999);
+
 		}
 
 		//保存したStageDataListの中でデータの置き換え作業
 		
 		for (auto&& data : stagesdatalist) 
 		{
-			if(data.ID == ID)data = StagesDataList(ID, editguiptr->stagename.text, screenshotpath,U"No",9999);//新規保存はクリア情報を一新
+			if(data.ID == ID)data = StagesDataList(ID, editguiptr->stagename.text, screenshotpath,U"No",9999);//編集保存はクリア情報を一新
+
+			
 		}
 
 		//stagesdatalist[ID] = StagesDataList(ID, editguiptr->stagename.text, screenshotpath);
@@ -107,6 +116,7 @@ public:
 		for (auto&& data : stagesdatalist) 
 		{
 			csvdata.write(data.stagename, data.screenpath, data.clearstate, data.time);
+			csvdata.newLine();
 		}
 		
 
@@ -118,12 +128,34 @@ public:
 		//一時ファイルは削除する
 		FileSystem::Remove(U"StagesData/NewStagesData.csv");
 
+		csvdata.clear();
+
+		//クリアデータ
+
+		//csvdata.load(directoryname + U"/ClearData.csv");
+		//csvdata.save(directoryname + U"/ClearData.csv");
+
+		//csvdata.load(directoryname + U"/NewClearData.csv");
+		//csvdata.write(U"クリア状況", U"クリアタイム");
+		//csvdata.newLine();
+		//csvdata.write(U"No", U"9999");//新規保存はクリアデータを初期化
+		//csvdata.save(directoryname + U"NewClearData.csv");
+
+		//新しく作り直したファイルを本データにコピーさせる
+		//FileSystem::Copy(directoryname + U"/NewClearData.csv", directoryname + U"/ClearData.csv", CopyOption::Overwrite_if_Exists);
+
+		//一時ファイルは削除する
+		//FileSystem::Remove(directoryname + U"/NewClearData.csv");
+		
 		//
 
+		//Block保存 "StagesData/Stage01/BlockData.csv"
 		
 
+		csvdata.load(directoryname + U"/BlockData.csv");
+		csvdata.save(directoryname + U"/BlockData.csv");
+		csvdata.clear();
 
-		//Block保存 "StagesData/Stage01/BlockData.csv"
 		csvdata.load(directoryname + U"/NewBlockData.csv");
 		csvdata.write(U"x座標", U"y座標", U"幅", U"高さ", U"rad", U"radpUus", U"vx", U"vy");//8項目)
 		csvdata.newLine();
@@ -135,12 +167,12 @@ public:
 			{
 				csvdata.write(block->block.pos.x);
 				csvdata.write(block->block.pos.y);
-				csvdata.write(block->block.h);
-				csvdata.write(block->block.w);
+				csvdata.write((int)block->block.w);
+				csvdata.write((int)block->block.h);
 				csvdata.write(block->rad);
 				csvdata.write(block->radplus);
-				csvdata.write(block->vx);
-				csvdata.write(block->vy);
+				csvdata.write((int)block->vx);
+				csvdata.write((int)block->vy);
 				csvdata.newLine();
 			}
 		}
@@ -149,18 +181,26 @@ public:
 		csvdata.save(directoryname + U"/NewBlockData.csv");
 		
 		//新しく作り直したファイルを本データにコピーさせる
-		FileSystem::Copy(U"StagesData/NewBlockData.csv", U"StagesData/BlockData.csv", CopyOption::Overwrite_if_Exists);
+		FileSystem::Copy(directoryname + U"/NewBlockData.csv", directoryname + U"/BlockData.csv", CopyOption::Overwrite_if_Exists);
 
 		//一時ファイルは削除する
-		FileSystem::Remove(U"StagesData/NewBlockData.csv");
+		FileSystem::Remove(directoryname + U"/NewBlockData.csv");
 
-
+		csvdata.clear();
+		
+		
 		//Line
 		//csvdata.load(U"LineData.csv");
 		
 		//Goalとスタート等 "StagesData/Stage01/Utility.csv"
+		//csvdata.load(directoryname + U"/UtilityData.csv");
+		//csvdata.save(directoryname + U"/UtilityData.csv");
+		//csvdata.clear();
 
 		csvdata.load(directoryname + U"/NewUtilityData.csv");
+
+		
+
 		csvdata.write(U"Start.x",U"Start.y",U"Goal.x",U"Goal,y");
 		csvdata.newLine();
 		
@@ -169,21 +209,25 @@ public:
 		csvdata.newLine();
 		//
 
-		csvdata.save(directoryname + U"/NewUtilityData.csv");
+		csvdata.save(directoryname + U"/UtilityData.csv");
 
 		//新しく作り直したファイルを本データにコピーさせる
-		FileSystem::Copy(U"StagesData/NewUtilityData.csv", U"StagesData/UtilityData.csv", CopyOption::Overwrite_if_Exists);
+		FileSystem::Copy(directoryname + U"/NewUtilityData.csv", directoryname + U"/UtilityData.csv", CopyOption::Overwrite_if_Exists);
 
 		//一時ファイルは削除する
-		FileSystem::Remove(U"StagesData/NewUtilityData.csv");
+		FileSystem::Remove(directoryname+ U"/NewUtilityData.csv");
+		
+		csvdata.clear();
 
 		editguiptr->saving = false;
+
 		//クローズではなく、.save()がその役目をしているらしい
 		
 	}
 
-	void stageread(String stagename,Ball_kun ballkun) 
+	void stageread(String stagename,Ball_kun& ballkun,int option) 
 	{
+		if (stagename == U"新規作成") return;
 	
 		//ゴールやスタート地点
 
@@ -198,20 +242,81 @@ public:
 
 		//Blockの初期化
 		objectmanagerptr->blocks = {};
-
+		
 		//
+		if (csvdata.get<String>(1, 1) != U"None") {
 
-		for (size_t i = 0; i < csvdata.columns(1); i++) 
-		{
-			objectmanagerptr->blockadd(std::make_shared<Block>(RectF(Vec2(csvdata.get<double>(i, 0), csvdata.get<double>(i, 1)), csvdata.get<int>(i, 2), csvdata.get<int>(i, 3)), csvdata.get<int>(i, 4), csvdata.get<int>(i, 5), csvdata.get<int>(i, 6), csvdata.get<int>(i, 7),&ballkun ));
+			for (size_t i = 1; i < csvdata.rows(); i++)
+			{
+				objectmanagerptr->blockadd(std::make_shared<Block>(RectF(Vec2(csvdata.get<double>(i, 0), csvdata.get<double>(i, 1)), csvdata.get<int>(i, 2), csvdata.get<int>(i, 3)), csvdata.get<double>(i, 4), csvdata.get<double>(i, 5), csvdata.get<int>(i, 6), csvdata.get<int>(i, 7), &ballkun, option));
+			}
+
 		}
-
-
 
 
 	}
 
-	
+	bool cleardata(int ID,String filepath,int time) 
+	{
+		stagesdatalist = {};
+		bool newrecord = false;
+
+		//管理用ファイル "StagesData/StageData.csv
+
+		//割り振られたIDの行に記述するんだと思う→そうはいかないので全部書き直し
+
+		//前の内容をコピー
+
+		//既存ファイルを一時的に開き、要素を格納する
+		csvdata.load(U"StagesData/StagesData.csv");
+		for (size_t i = 1; i < csvdata.rows(); i++)
+		{
+			stagesdatalist.emplace_back(i, csvdata.get<String>(i, 0), csvdata.get<String>(i, 1), csvdata.get<String>(i, 2), csvdata.get<int>(i, 3));
+		}
+
+
+
+		//保存したStageDataListの中で対応するIDにデータの置き換え作業
+
+		for (auto&& data : stagesdatalist)
+		{
+			if (data.ID == ID)
+			{
+				if (data.time > time) {
+					data = StagesDataList(ID, filepath, U"StagesData/" + filepath + U"/ScreenShot.png", U"Yes", time);
+					newrecord = true;
+				}
+			}
+		}
+
+		//stagesdatalist[ID] = StagesDataList(ID, editguiptr->stagename.text, screenshotpath);
+
+		//置き換えたら入れ直す
+
+		csvdata.load(U"StagesData/NewStagesData.csv");
+		csvdata.write(U"ステージ名", U"スクリーンショット（パス）", U"クリア状況", U"クリアタイム");
+		csvdata.newLine();
+
+		for (auto&& data : stagesdatalist)
+		{
+			csvdata.write(data.stagename, data.screenpath, data.clearstate, data.time);
+			csvdata.newLine();
+		}
+
+
+		csvdata.save(U"StagesData/NewStagesData.csv");
+
+		//新しく作り直したファイルを本データにコピーさせる
+		FileSystem::Copy(U"StagesData/NewStagesData.csv", U"StagesData/StagesData.csv", CopyOption::Overwrite_if_Exists);
+
+		//一時ファイルは削除する
+		FileSystem::Remove(U"StagesData/NewStagesData.csv");
+
+		csvdata.clear();
+
+		return newrecord;
+		
+	}
 
 
 };

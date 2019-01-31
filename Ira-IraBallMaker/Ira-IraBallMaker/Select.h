@@ -24,13 +24,14 @@ public:
 
 
 		//selectUIに遷移の関数を与える(かつ、選択したステージIDを受け取れるようにする)
-		selectUI.changescene = [&](int ID, String stagename) { if (getData().mode == 0)changeScene(SceneName::Game); else changeScene(SceneName::Making); getData().stagenum = ID; getData().filepath = stagename; };
+		selectUI.changescene = [&](int ID, String stagename) {if (getData().mode == 0)changeScene(SceneName::Game); else changeScene(SceneName::Making); getData().stagenum = ID; getData().filepath = stagename; };
 		
 	}
 
 
 	void update()override
 	{
+		if (MouseR.down())changeScene(SceneName::Title);
 		selectUI.update();
 		
 	}
@@ -43,7 +44,9 @@ public:
 		
 
 		selectUI.draw();
+		
 
+		//getData().font(getData().stagenum, getData().filepath).draw(0,0,Palette::Black);
 	}
 
 
