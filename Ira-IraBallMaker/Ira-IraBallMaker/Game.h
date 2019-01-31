@@ -47,7 +47,7 @@ public:
 		
 		datamanader.stageread(getData().filepath,ballkun,getData().mode);
 
-		
+		newrecord = false;
 		
 		//ゴールの位置をデータ通りに修正
 		//Blockをデータ通りに配置
@@ -90,7 +90,7 @@ public:
 
 			if (win) {
 				ballkun.facechange("WIN");
-				newrecord = datamanader.cleardata(getData().stagenum,getData().filepath,timer.s());
+				if(datamanader.cleardata(getData().stagenum,getData().filepath,timer.s()))newrecord = true;
 				//タイマーのタイムを入れたりする
 			}
 			if(lose)ballkun.facechange("LOSE");

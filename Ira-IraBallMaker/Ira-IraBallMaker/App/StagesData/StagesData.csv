@@ -1,6 +1,6 @@
 ﻿ステージ名,スクリーンショット（パス）,クリア状況,クリアタイム
 Stage01,StagesData/Stage01/ScreenShot.png,Yes,2
-Stage02,StagesData/Stage02/ScreenShot.png,No,9999
-Stage03,StagesData/Stage03/ScreenShot.png,No,9999
-Stage04,StagesData/Stage04/ScreenShot.png,No,9999
+Stage02,StagesData/Stage02/ScreenShot.png,Yes,2
+Stage03,StagesData/Stage03/ScreenShot.png,Yes,9
+Stage04,StagesData/Stage04/ScreenShot.png,Yes,4
 まわる,StagesData/まわる/ScreenShot.png,No,9999
