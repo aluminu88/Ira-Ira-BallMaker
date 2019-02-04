@@ -45,7 +45,7 @@ public:
 		
 		//stagedata‚É‡‚í‚¹‚Äƒf[ƒ^‚Ì“Ç‚İæ‚è
 		
-		datamanader.stageread(getData().filepath,ballkun,getData().mode);
+		datamanader.stagereadV2(getData().filepath,ballkun,getData().mode);
 
 		newrecord = false;
 		

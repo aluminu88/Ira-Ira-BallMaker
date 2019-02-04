@@ -37,19 +37,31 @@ public :
 
 	//GUI用変数
 	mutable double block_w = 0.0, block_h = 0.0, block_r=0.0,block_rp=0.0,block_vx=0.0,block_vy=0.0;
-	mutable bool c_vx = true, c_vy = false, c_additon = false, c_editoradd = true, c_savebutton = true;
+	mutable bool c_vx = true, c_vy = false, cb_addtion = false,cw_addtion, c_editoradd = true, c_savebutton = true;
 
 	//GUI用ウィンドウ
 	RectF BlockGUIBox = RectF(2000, 250, 400, 450);//{800,250}が定位置
-
 	RectF BlockGUIheader = RectF(2000, 250, 400, 30);
 
 	bool BlockGUIgrabbed = false;
+
+
+	RectF WireGUIBox = RectF(2000, 250, 250, 250);
+	RectF WireGUIheader = RectF(2000, 250, 250, 30);
+
+	bool WireGUIgrabbed = false;
 
 	//図形追加用
 	RectF  stampRect;
 	std::shared_ptr<Block> checkBlock = 0;
 	
+
+	/*Wire用*/
+
+	Vec2 pos1 = {-999,-999}, pos2 = { -999,-999 };
+
+
+
 
 	/*コンストラクタ*/
 
@@ -72,6 +84,18 @@ public :
 	};
 
 	mutable size_t blockaddIndex = 0;
+
+
+	//直線の追加設定、通常、x固定、y固定
+
+	const Array<String>wireaddoptions =
+	{
+		U"Normal",U"X_SET",U"Y_SET"
+	};
+	
+	mutable size_t wireaddIndex = 0;
+
+
 
 
 	//図形を編集するか、図形を追加するか
@@ -105,6 +129,7 @@ public :
 		if (objectoptions[objectIndex] == U"None") {
 			c_editoradd = false;
 			BlockGUIBox.x = 2000;//表示しない
+			WireGUIBox.x = 2000;//表示しない
 
 			//goalを持ち運べる
 			if (goalptr->goalrect.leftClicked()) {
@@ -165,7 +190,7 @@ public :
 			//Add機能
 			if (editoptions[editoraddIndex] == U"Add")
 			{
-				c_additon = true;
+				cb_addtion = true;
 
 				if (MouseR.down() && stampRect.w > 0 && stampRect.w > 0)
 				{
@@ -177,7 +202,7 @@ public :
 			{
 				//強制的にInvisibleし、addoptionを非アクティブ
 				blockaddIndex = 2;
-				c_additon = false;
+				cb_addtion = false;
 
 				//選択した図形の値をハイライトし、以降GUIから変更が可能
 
@@ -220,12 +245,69 @@ public :
 			}
 
 		}
+		else objectmanagerptr->selectedBlock = NULL;//ブロックが選択されてない状態へ戻す
 
 		//
 
+		/*Wire用の項目*/
+		WireGUIheader.pos = WireGUIBox.pos;
+
+		//Wire編集機能
+		if (objectoptions[objectIndex] == U"Line") 
+		{
+			//BlockGUIを表示
+			WireGUIBox.x = 800;
+
+			//Addモード
+			if (editoptions[editoraddIndex] == U"Add") 
+			{
+				if (pos1 == Vec2(-999,-999)) {
+					//編集枠に触れないで右クリック
+					if (MouseR.down() && !Rect(800, 0, 400, 700).intersects(Cursor::PosF()) && !Rect(0, 600, 1200, 100).intersects(Cursor::PosF()))
+					{
+						pos1 = Cursor::PosF();
+					}
+				}
+				else 
+				{
+					//モードに合わせ、カーソルに合わせて設定座標までの直線を表示しつづける
+
+					if(wireaddoptions[wireaddIndex] == U"Normal") pos2 = Cursor::PosF();//通常反映
+					else if (wireaddoptions[wireaddIndex] == U"X_SET") pos2 = Vec2(pos1.x, Cursor::PosF().y);//pos1のx座標で固定
+					else if (wireaddoptions[wireaddIndex] == U"Y_SET") pos2 = Vec2(Cursor::PosF().x, pos1.y);//pos1のy座標で固定
+
+
+					if (MouseR.down() && !Rect(800, 0, 400, 700).intersects(Cursor::PosF()) && !Rect(0, 600, 1200, 100).intersects(Cursor::PosF())) 
+					{
+
+						objectmanagerptr->wireadd(std::make_shared<Wire>(pos1, pos2,ballkunptr));
+						
+						//追加して編集用座標を初期化
+						pos1 = Vec2(-999, -999);
+						pos2 = Vec2(-999, -999);
+
+					}
+				}
+
+
+
+			}
+
+			//Editモード
+			if (editoptions[editoraddIndex] == U"Edit") 
+			{
+				//ホントは各座標点を持って動かしたりしたいの
+			}
+
+
+
+		}
+
+
 	}
 
-	
+	//Rect(800, 0, 400, 700).draw(Palette::Gray);
+	//Rect(0, 600, 1200, 100).draw(Palette::Gray);
 
 	void BlockGUIsystem()const 
 	{
@@ -247,7 +329,7 @@ public :
 
 		}
 
-		//スライダー
+		//GUIレイアウト
 		itemfont(U"width:").draw(BlockGUIBox.pos + Vec2(2, 40), Palette::Black);
 		if (SimpleGUI::Button(U"-", BlockGUIBox.pos + Vec2(65, 40), 20))
 		{
@@ -297,6 +379,7 @@ public :
 		{
 			block_r = 0.00;
 		}
+
 
 		itemfont(U"radplus:").draw(BlockGUIBox.pos + Vec2(2, 160), Palette::Black);
 		if (SimpleGUI::Button(U"-", BlockGUIBox.pos + Vec2(65, 160), 20))
@@ -348,9 +431,22 @@ public :
 		}
 
 		itemfont(U"addoption:").draw(BlockGUIBox.pos + Vec2(2, 285),Palette::Black);
-		SimpleGUI::RadioButtons(blockaddIndex, blockaddoptions, BlockGUIBox.pos + Vec2(0, 310), unspecified,c_additon);
+		SimpleGUI::RadioButtons(blockaddIndex, blockaddoptions, BlockGUIBox.pos + Vec2(0, 310), unspecified,cb_addtion);
 
-	};
+	}
+
+	void WireGUIsystem()const 
+	{
+		//モード		
+		itemfont(U"addoption:",pos1,pos2).draw(WireGUIBox.pos + Vec2(2, 40), Palette::Black);
+		
+		SimpleGUI::RadioButtons(wireaddIndex, wireaddoptions, WireGUIBox.pos + Vec2(0, 80), unspecified, cw_addtion);
+
+		if (pos1 != Vec2(-999, -999)) 
+		{
+			Line(pos1, pos2).draw(Palette::White);
+		}
+	}
 
 	void CommonGUIsystem()const
 	{
@@ -407,6 +503,9 @@ public :
 		BlockGUIheader.draw(Palette::White);
 		datafont(U"BlockGUI").drawAt(BlockGUIheader.center(),Palette::Black);
 
+		WireGUIBox.draw(Palette::Silver);
+		WireGUIheader.draw(Palette::White);
+		datafont(U"WireGUI").drawAt(WireGUIheader.center(), Palette::Black);
 
 		//マウス座標の表示
 		datafont(Cursor::Pos()).draw(800,200);
@@ -415,7 +514,7 @@ public :
 
 		CommonGUIsystem();
 		BlockGUIsystem();
-
+		WireGUIsystem();
 
 		//操作方法の説明
 

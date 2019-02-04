@@ -338,7 +338,7 @@ public:
 			{
 				grabbed = false;
 			}
-			else if (grabbed) 
+			else if (grabbed && state == SelectState::d_select)
 			{
 				block.pos += Cursor::DeltaF();
 				sub_block = block;
@@ -462,6 +462,158 @@ public:
 //};
 
 
+class Wire : public IObject{
+
+
+public :
+
+	//必要のなもの
+
+	//始点・終点
+	Vec2 pos1, pos2;
+
+	double width;
+	
+	Line line;
+
+	Wire(Vec2 _pos1, Vec2 _pos2,Ball_kun* _Ball) :
+		pos1(_pos1),
+		pos2(_pos2) ,
+		IObject(_Ball)
+	{
+		//編集時追加は自動的にID"1"を振る
+		setID(1);
+		line = Line(pos1, pos2);
+	}
+
+	Wire(Vec2 _pos1, Vec2 _pos2, Ball_kun* _Ball,int _option) :
+		pos1(_pos1),
+		pos2(_pos2),
+		IObject(_Ball)
+	{
+		//ゲーム時生成はID"0"を振る
+		setID(_option);
+		line = Line(pos1, pos2);
+	}
+
+	//要素単体の処理はここで
+
+	void update() override
+	{
+		//衝突判定、選択判定など
+		if (Ball->ballbody.intersects(line)) 
+		{
+			hitting();
+		}
+
+		//移動とか(Lineはしない)
+
+
+		//編集中のみの処理
+		if (getID() == 1) 
+		{
+
+
+			//図形を選択する
+			if (line.boundingRect().leftClicked() && !(Rect(800, 0, 400, 700).intersects(Cursor::Pos()) || Rect(0, 600, 1200, 100).intersects(Cursor::Pos())))
+			{
+				
+				if (state == SelectState::none)
+				{
+					state = SelectState::select;
+				}
+				else if (state == SelectState::select)
+				{
+					state = SelectState::d_select;
+				}
+				else if (state == SelectState::d_select)
+				{
+					state = SelectState::none;
+				}
+
+
+			}
+			else if (MouseL.down() && !(Rect(800, 0, 400, 700).intersects(Cursor::Pos()) || Rect(0, 600, 1200, 100).intersects(Cursor::Pos()))) state = SelectState::none;
+
+
+			//図形を掴む
+			if (line.boundingRect().leftClicked() && !Ball->ballbody.intersects(Cursor::PosF()) && state == SelectState::d_select)
+			{
+				grabbed = true;
+			}
+			else if (MouseL.up())
+			{
+				grabbed = false;
+			}
+			else if (grabbed && state == SelectState::d_select)
+			{
+
+				pos1+= Cursor::DeltaF();
+				pos2+= Cursor::DeltaF();
+				line.begin += Cursor::DeltaF();
+				line.end += Cursor::DeltaF();				
+			}
+
+			//図形のhitを初期化する
+			if (gethit())
+			{
+				if (!Ball->ballbody.intersects(line))
+				{
+					hitreset();
+				}
+			}
+
+			//削除状態にする
+			if (state == SelectState::d_select)
+			{
+				if (MouseR.down() || KeyD.down()) kill();
+
+				if (MouseL.up() && !Rect(0, 0, 800, 600).intersects(line)) kill();
+			}
+			//if (line.length()<=2) kill();
+
+
+
+		}
+
+	}
+
+	void draw() const
+	{
+		//判定によって色を変えて描画する
+
+		if (gethit()) 
+		{
+			line.draw(Palette::Red);
+		}
+		else line.draw(Palette::White);
+
+
+		//編集中の処理
+		if (getID() == 1) 
+		{
+
+
+			//選択状態の描画
+
+			if (state == SelectState::select)
+			{
+				//Rectに変換して枠の描画
+				line.boundingRect().drawFrame(0, 2, Palette::Aqua);//内、外
+			}
+			else if (state == SelectState::d_select) {
+				line.boundingRect().drawFrame(0, 2, Palette::Orange);
+
+			}
+		}
+
+
+	}
+
+
+
+};
+
 
 class ObjectManager {
 
@@ -471,6 +623,12 @@ public :
 	std::shared_ptr<Block> selectedBlock ;
 
 	std::vector<std::shared_ptr<Block>> blocks;
+
+	std::shared_ptr<Wire> selectedWire;
+
+	std::vector<std::shared_ptr<Wire>> wires;
+
+
 
 
 
@@ -483,6 +641,8 @@ public :
 	void add(const std::shared_ptr<Block>& ptr);
 	
 	void blockadd(const std::shared_ptr<Block>& ptr);
+
+	void wireadd(const std::shared_ptr<Wire>& ptr);
 
 	
 	bool selectflag= false;

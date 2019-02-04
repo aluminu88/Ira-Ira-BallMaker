@@ -40,7 +40,7 @@ public:
 		datamanager.editguiptr->stagename.text = getData().filepath;
 
 
-		datamanager.stageread(getData().filepath, ballkun,getData().mode);
+		datamanager.stagereadV2(getData().filepath, ballkun,getData().mode);
 
 		
 		//テスト用
@@ -70,7 +70,7 @@ public:
 		editgui.update();
 		if (editgui.saving) 
 		{
-			datamanager.stagesave(getData().stagenum);
+			datamanager.stagesaveV2(getData().stagenum);
 			changeScene(SceneName::Select);
 		}
 
