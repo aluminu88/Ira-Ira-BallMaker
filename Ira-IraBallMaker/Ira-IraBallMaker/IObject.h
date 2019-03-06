@@ -134,7 +134,7 @@ public:
 	//ボールとの衝突判定
 
 		//真衝突判定
-			if (Ball->ballbody.intersects(block.rotated(rad)))
+			if (Ball->ballbody.intersects(block.rotated(ToRadians(rad))))
 			{
 				hitting();
 			}
@@ -145,15 +145,22 @@ public:
 		//回転
 		
 
-		rad += radplus;
-		if (rad > 6.28) {
+		if (radplus != 0) {
 
-			while (rad > 12.56) {
+			rad += (int)radplus;
 
-				rad = rad - 6.28;
+			if (rad >= 360)
+			{
+				rad = rad - 720;
 
 			}
+			else if (rad < -360)
+			{
+				rad = rad + 720;
+			}
+
 		}
+		
 
 		if (!grabbed)block.pos += {vx, vy};
 
@@ -168,7 +175,7 @@ public:
 
 				sub_block.pos.x = 0 - sub_block.w - vx;
 
-				if (Ball->ballbody.intersects(block.rotated(rad))) {//blockが含まれているときのあたり判定
+				if (Ball->ballbody.intersects(block.rotated(ToRadians(rad)))) {//blockが含まれているときのあたり判定
 
 					hitting();
 				}
@@ -182,7 +189,7 @@ public:
 				sub_block.pos += {vx, 0};//sub_blockを動かしてループしているように見せる
 
 
-				if (Ball->ballbody.intersects(sub_block.rotated(rad))) {//この間sub_blockのあたり判定を持たせる
+				if (Ball->ballbody.intersects(sub_block.rotated(ToRadians(rad)))) {//この間sub_blockのあたり判定を持たせる
 					hitting();
 				}
 				
@@ -202,7 +209,7 @@ public:
 
 				sub_block.pos.x = 800 - vx;
 
-				if (Ball->ballbody.intersects(block.rotated(rad))) {
+				if (Ball->ballbody.intersects(block.rotated(ToRadians(rad)))) {
 
 					hitting();
 
@@ -216,7 +223,7 @@ public:
 				sub_block.pos += {vx, 0};
 
 
-				if (Ball->ballbody.intersects(sub_block.rotated(rad))) {
+				if (Ball->ballbody.intersects(sub_block.rotated(ToRadians(rad)))) {
 					hitting();
 				}
 				
@@ -237,7 +244,7 @@ public:
 			if (0 < (block.tl().y)) {//Rectが含まれている→y上が画面内→y上が0より大
 
 				sub_block.pos.y = 600 - vy;//下にセット
-				if (Ball->ballbody.intersects(block.rotated(rad))) {
+				if (Ball->ballbody.intersects(block.rotated(ToRadians(rad)))) {
 
 					hitting();
 				}
@@ -250,7 +257,7 @@ public:
 				sub_block.pos += {vx, vy};
 
 
-				if (Ball->ballbody.intersects(sub_block.rotated(rad))) {
+				if (Ball->ballbody.intersects(sub_block.rotated(ToRadians(rad)))) {
 					hitting();
 				}
 				
@@ -271,7 +278,7 @@ public:
 			if (600 > (block.bl().y)) {//Rectが含まれている→y下が画面内→y下が600より小
 
 				sub_block.pos.y = 0 - block.h - vy;//上にセット
-				if (Ball->ballbody.intersects(block.rotated(rad))) {
+				if (Ball->ballbody.intersects(block.rotated(ToRadians(rad)))) {
 
 					hitting();
 				}
@@ -284,7 +291,7 @@ public:
 				sub_block.pos += {vx, vy};
 
 
-				if (Ball->ballbody.intersects(sub_block.rotated(rad))) {
+				if (Ball->ballbody.intersects(sub_block.rotated(ToRadians(rad)))) {
 					hitting();
 				}
 				
@@ -304,7 +311,7 @@ public:
 
 
 			//図形を選択する
-			if ((block.rotated(rad).leftClicked() || sub_block.rotated(rad).leftClicked()) && !(Rect(800, 0, 400, 700).intersects(Cursor::Pos()) || Rect(0, 600, 1200, 100).intersects(Cursor::Pos())))
+			if ((block.rotated(ToRadians(rad)).leftClicked() || sub_block.rotated(ToRadians(rad)).leftClicked()) && !(Rect(800, 0, 400, 700).intersects(Cursor::Pos()) || Rect(0, 600, 1200, 100).intersects(Cursor::Pos())))
 			{
 				//if (getselect())d_select();
 				//select();
@@ -347,7 +354,7 @@ public:
 			//図形のhitを初期化する
 			if (gethit()) 
 			{
-				if (!(Ball->ballbody.intersects(block.rotated(rad)))&& !(Ball->ballbody.intersects(sub_block.rotated(rad)) && sub_block.intersects(Rect(0, 0, 800, 600))))
+				if (!(Ball->ballbody.intersects(block.rotated(ToRadians(rad))))&& !(Ball->ballbody.intersects(sub_block.rotated(ToRadians(rad))) && sub_block.intersects(Rect(0, 0, 800, 600))))
 				{
 					hitreset();
 				}
@@ -373,37 +380,37 @@ public:
 
 		if (gethit())
 		{
-			block.rotated(rad).draw(Palette::Red);//衝突→赤
-			//sub_block.rotated(rad).draw(Palette::Red);
+			block.rotated(ToRadians(rad)).draw(Palette::Red);//衝突→赤
+			//sub_block.rotated(ToRadians(rad)).draw(Palette::Red);
 		}
 		else {
-			block.rotated(rad).draw(Palette::White);
-			//sub_block.rotated(rad).draw(Palette::White);//非衝突→白
+			block.rotated(ToRadians(rad)).draw(Palette::White);
+			//sub_block.rotated(ToRadians(rad)).draw(Palette::White);//非衝突→白
 		}
 
 		//ループ移動のための描画
 
 		if ((!(800 > (block.tr().x)) && vx > 0) || (!(0 < (block.tl().x)) && vx < 0) || (!(0 < block.tl().y) && vy < 0) || (!(600 > block.bl().y) && vy > 0)) {//含まれてないときのみ
 
-			if (state == SelectState::select)sub_block.rotated(rad).drawFrame(2, 0, Palette::Aqua);
-			if (state == SelectState::d_select)sub_block.rotated(rad).drawFrame(2, 0, Palette::Orange);
+			if (state == SelectState::select)sub_block.rotated(ToRadians(rad)).drawFrame(2, 0, Palette::Aqua);
+			if (state == SelectState::d_select)sub_block.rotated(ToRadians(rad)).drawFrame(2, 0, Palette::Orange);
 
 			if (gethit()) {
 
-				sub_block.rotated(rad).draw(Palette::Red);
+				sub_block.rotated(ToRadians(rad)).draw(Palette::Red);
 
 			}
-			else sub_block.rotated(rad).draw(Palette::White);
+			else sub_block.rotated(ToRadians(rad)).draw(Palette::White);
 
 		}
 
 		//if ((800 >= (block.tl.x) && vx > 0) || (0 <= (block.tr().x) && vx < 0)) {
 		if (gethit()) {
 
-			block.rotated(rad).draw(Palette::Red);
+			block.rotated(ToRadians(rad)).draw(Palette::Red);
 
 		}
-		else block.rotated(rad).draw(Palette::White);
+		else block.rotated(ToRadians(rad)).draw(Palette::White);
 
 
 
@@ -413,12 +420,12 @@ public:
 			//選択されている
 			if (state == SelectState::select)
 			{
-				block.rotated(rad).drawFrame(2, 0, Palette::Aqua);
+				block.rotated(ToRadians(rad)).drawFrame(2, 0, Palette::Aqua);
 				
 				
 			}
 			else if (state == SelectState::d_select) {
-				block.rotated(rad).drawFrame(2, 0, Palette::Orange);
+				block.rotated(ToRadians(rad)).drawFrame(2, 0, Palette::Orange);
 				
 			}
 

@@ -167,6 +167,35 @@ public :
 
 		//Block編集機能
 
+		//ウィンドウのとっかえひっかえ
+		switch (objectIndex) 
+		{
+		case 0://None
+			
+			BlockGUIBox.x = 2000;
+			WireGUIBox.x = 2000;
+
+			break;
+
+		case 1 ://Block
+
+			if (BlockGUIBox.x == 2000)BlockGUIBox.x = 800;
+			WireGUIBox.x = 2000;
+
+			break;
+
+		case 2://Wire
+
+			BlockGUIBox.x = 2000;
+			if (BlockGUIBox.x == 2000)WireGUIBox.x = 800;
+
+			break;
+
+		}
+
+
+
+
 		if (objectoptions[objectIndex] == U"Block")
 		{
 
@@ -185,7 +214,8 @@ public :
 
 
 			//BlockGUIを表示
-			BlockGUIBox.x = 800;
+			//if(BlockGUIBox.x == 2000)
+			//BlockGUIBox.x = 800;
 
 			//Add機能
 			if (editoptions[editoraddIndex] == U"Add")
@@ -229,8 +259,8 @@ public :
 						//常時反映可能
 						objectmanagerptr->selectedBlock->block.w = (int)block_w;
 						objectmanagerptr->selectedBlock->block.h = (int)block_h;
-						objectmanagerptr->selectedBlock->rad = block_r;
-						objectmanagerptr->selectedBlock->radplus = block_rp;
+						if((int)block_rp ==0) objectmanagerptr->selectedBlock->rad = (int)block_r;
+						objectmanagerptr->selectedBlock->radplus = (int)block_rp;
 						objectmanagerptr->selectedBlock->vx = (int)block_vx;
 						objectmanagerptr->selectedBlock->vy = (int)block_vy;
 
@@ -255,12 +285,14 @@ public :
 		//Wire編集機能
 		if (objectoptions[objectIndex] == U"Line") 
 		{
-			//BlockGUIを表示
-			WireGUIBox.x = 800;
-
+			//WireGUIを表示
+			//WireGUIBox.x = 800;
+			cw_addtion = true;
 			//Addモード
 			if (editoptions[editoraddIndex] == U"Add") 
 			{
+				//cw_addtion = true;
+
 				if (pos1 == Vec2(-999,-999)) {
 					//編集枠に触れないで右クリック
 					if (MouseR.down() && !Rect(800, 0, 400, 700).intersects(Cursor::PosF()) && !Rect(0, 600, 1200, 100).intersects(Cursor::PosF()))
@@ -292,6 +324,7 @@ public :
 
 
 			}
+			
 
 			//Editモード
 			if (editoptions[editoraddIndex] == U"Edit") 
@@ -302,6 +335,7 @@ public :
 
 
 		}
+		else cw_addtion = false;
 
 
 	}
@@ -340,12 +374,13 @@ public :
 		{
 			block_w++;
 		}
-		datafont((int)block_w).draw(BlockGUIBox.pos + Vec2(320, 40), Palette::Black);
+		datafont(U"{:.0f}"_fmt(block_w)).draw(BlockGUIBox.pos + Vec2(320, 40), Palette::Black);
 		if (SimpleGUI::Button(U"0", BlockGUIBox.pos + Vec2(365, 40), 20))
 		{
 			block_w = 0;
 		}
-
+		//intにキャストして代入して補正
+		block_w = (int)block_w;
 
 		itemfont(U"height:").draw(BlockGUIBox.pos + Vec2(2, 80), Palette::Black);
 		if (SimpleGUI::Button(U"-", BlockGUIBox.pos + Vec2(65, 80), 20))
@@ -357,46 +392,49 @@ public :
 		{
 			block_h++;
 		}
-		datafont((int)block_h).draw(BlockGUIBox.pos + Vec2(320, 80), Palette::Black);
+		datafont(U"{:.0f}"_fmt(block_h)).draw(BlockGUIBox.pos + Vec2(320, 80), Palette::Black);
 		if (SimpleGUI::Button(U"0", BlockGUIBox.pos + Vec2(365, 80), 20))
 		{
 			block_h = 0;
 		}
-
+		//intにキャストして代入して補正
+		block_h = (int)block_h;
 
 		itemfont(U"rad:").draw(BlockGUIBox.pos + Vec2(2, 120), Palette::Black);
 		if (SimpleGUI::Button(U"-", BlockGUIBox.pos + Vec2(65, 120), 20))
 		{
-			block_r-=0.01;
+			block_r -= 1;
 		}
-		SimpleGUI::Slider(block_r, -3.14, 3.14, BlockGUIBox.pos + Vec2(90, 120), 200);//角度
+		SimpleGUI::Slider(block_r, -360, 360, BlockGUIBox.pos + Vec2(90, 120), 200);//角度
 		if (SimpleGUI::Button(U"+", BlockGUIBox.pos + Vec2(295, 120), 20))
 		{
-			block_r+=0.01;
+			block_r+=1;
 		}
-		datafont(block_r).draw(BlockGUIBox.pos + Vec2(320, 120), Palette::Black);
+		datafont(U"{:.0f}"_fmt(block_r)).draw(BlockGUIBox.pos + Vec2(320, 120), Palette::Black);
 		if (SimpleGUI::Button(U"0", BlockGUIBox.pos + Vec2(365, 120), 20))
 		{
-			block_r = 0.00;
+			block_r = 0;
 		}
-
+		//intにキャストして代入して補正
+		block_r = (int)block_r;
 
 		itemfont(U"radplus:").draw(BlockGUIBox.pos + Vec2(2, 160), Palette::Black);
 		if (SimpleGUI::Button(U"-", BlockGUIBox.pos + Vec2(65, 160), 20))
 		{
-			block_rp-=0.01;
+			block_rp -= 1;
 		}
-		SimpleGUI::Slider(block_rp, -3.14, 3.14, BlockGUIBox.pos + Vec2(90, 160), 200);//角速度
+		SimpleGUI::Slider(block_rp, -360, 360, BlockGUIBox.pos + Vec2(90, 160), 200);//角速度
 		if (SimpleGUI::Button(U"+", BlockGUIBox.pos + Vec2(295, 160), 20))
 		{
-			block_rp+=0.01;
+			block_rp += 1;
 		}
-		datafont(block_rp).draw(BlockGUIBox.pos + Vec2(320, 160), Palette::Black);
+		datafont(U"{:.0f}"_fmt(block_rp)).draw(BlockGUIBox.pos + Vec2(320, 160), Palette::Black);
 		if (SimpleGUI::Button(U"0", BlockGUIBox.pos + Vec2(365, 160), 20))
 		{
 			block_rp = 0.0;
 		}
-
+		//intにキャストして代入して補正
+		block_rp = (int)block_rp;
 
 		itemfont(U"vx:").draw(BlockGUIBox.pos + Vec2(2, 200), Palette::Black);
 		if (SimpleGUI::Button(U"-", BlockGUIBox.pos + Vec2(65, 200), 20,c_vx))
@@ -413,6 +451,7 @@ public :
 		{
 			block_vx = 0;
 		}
+		block_vx = (int)block_vx;
 
 		itemfont(U"vy:").draw(BlockGUIBox.pos + Vec2(2, 240), Palette::Black);
 		if (SimpleGUI::Button(U"-", BlockGUIBox.pos + Vec2(65, 240), 20,c_vy))
@@ -428,6 +467,12 @@ public :
 		if (SimpleGUI::Button(U"0", BlockGUIBox.pos + Vec2(365, 240), 20,c_vy))
 		{
 			block_vy = 0;
+		}
+		block_vy = (int)block_vy;
+
+		if (SimpleGUI::Button(U"reset", BlockGUIBox.pos + Vec2(200, 300), 100))
+		{
+			block_h = 100, block_w = 100, block_r = 0, block_rp = 0, block_vx = 0, block_vy = 0;
 		}
 
 		itemfont(U"addoption:").draw(BlockGUIBox.pos + Vec2(2, 285),Palette::Black);
